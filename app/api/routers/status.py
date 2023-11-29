@@ -1,20 +1,21 @@
+from app.api.sevices.scraping import ScrapingService
 from fastapi import APIRouter
 
 router = APIRouter()
 
 @router.get('/')
-def test():
+async def test():
     return 'whatever'
 
-
 @router.get('/aws')
-def getAwsStatus():
-    return f'function that will return AWS status page'
+async def getAwsStatus():
+    print(f'function that will return AWS status page')
 
 @router.get('/jira')
-def getJiraStatus():
-    return f'function that will return Jira status page'
+async def getJiraStatus():
+    print(f'function that will return Jira status page')
+    return ScrapingService.getJiraStatus()
 
 @router.get('/oci')
-def getOciStatus():
-    return f'function that will return OCI status page'
+async def getOciStatus():
+    print(f'function that will return OCI status page')
