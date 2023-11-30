@@ -1,7 +1,7 @@
-from app.api.sevices.scraping import ScrapingService
+from app.api.services.scraping import ScrapingService
 from fastapi import APIRouter
 
-router = APIRouter()
+router = APIRouter(prefix="/status")
 
 @router.get('/aws')
 async def getAwsStatus():
@@ -9,7 +9,6 @@ async def getAwsStatus():
 
 @router.get('/jira')
 async def getJiraStatus():
-    print(f'function that will return Jira status page')
     return ScrapingService.getJiraStatus()
 
 @router.get('/oci')
