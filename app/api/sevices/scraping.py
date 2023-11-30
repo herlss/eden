@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 
 class ScrapingService:
-
     @classmethod
     def getJiraStatus(cls):
         atlassianStatus = cls.AtlassianStatus()

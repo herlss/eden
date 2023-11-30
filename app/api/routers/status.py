@@ -3,10 +3,6 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.get('/')
-async def test():
-    return 'whatever'
-
 @router.get('/aws')
 async def getAwsStatus():
     print(f'function that will return AWS status page')

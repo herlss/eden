@@ -1,6 +1,11 @@
-from fastapi import FastAPI
-from app.api.routers import status
+import uvicorn
+from os import getenv
 
-app = FastAPI()
-
-app.include_router(status.router)
+if __name__ == '__main__':
+    port = int(getenv("PORT", 8080))
+    uvicorn.run(
+        "app.api.api:app",
+        host="0.0.0.0",
+        port=port,
+        reload=True
+    )
