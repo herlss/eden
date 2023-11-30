@@ -30,8 +30,8 @@ class DashboardService:
 
         return dashboard
 
-    # Gráfico do dash abaixo será apenas 1(ou 2) big numbers. Colocar na descrição do(s) big number(s): "Services in Normal 
-    # Performance status" e "Services in not Normal Performance status :/"
+    # Gráfico do dash abaixo será apenas 1(ou 2) big numbers. Colocar na descrição do(s) big number(s): "Oracle Services in Normal 
+    # Performance status" e "Oracle Services in not Normal Performance status :/"
     @classmethod
     def getOciDashboard(cls):
         url = "https://ocistatus.oraclecloud.com/api/v2/components_v2.json"
