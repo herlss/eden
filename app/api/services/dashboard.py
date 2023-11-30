@@ -3,6 +3,8 @@ from app.scraping.aws import AwsDashboardData
 import requests as req
 import json as js
 
+from app.scraping.oci import OciStatus
+
 class DashboardService:
     @classmethod
     def getAwsDashboard(self):
@@ -87,11 +89,8 @@ class DashboardService:
     # Performance status" e "Oracle Services in not Normal Performance status :/"
     @classmethod
     def getOciDashboard(cls):
-        url = "https://ocistatus.oraclecloud.com/api/v2/components_v2.json"
 
-        r = req.get(url)
-
-        data = r.json()
+        data = OciStatus()
         json = []
 
         for region in data["regionHealthReports"]:
