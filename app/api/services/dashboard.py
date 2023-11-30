@@ -1,5 +1,7 @@
 from app.scraping.atlassian import AtlassianIncidents, JiraStatus
 from app.scraping.aws import AwsDashboardData
+import requests as req
+import json as js
 
 class DashboardService:
     @classmethod
@@ -70,3 +72,32 @@ class DashboardService:
                     serverHistoric[incidents['impact']][1] = 1
         
         return serverHistoric
+
+    # Gráfico do dash abaixo será apenas 1(ou 2) big numbers. Colocar na descrição do(s) big number(s): "Oracle Services in Normal 
+    # Performance status" e "Oracle Services in not Normal Performance status :/"
+    @classmethod
+    def getOciDashboard(cls):
+        url = "https://ocistatus.oraclecloud.com/api/v2/components_v2.json"
+
+        r = req.get(url)
+
+        data = r.json()
+        json = []
+
+        for region in data["regionHealthReports"]:
+            if "Sao Paulo" in region["regionName"]:
+                json.append(region)
+            elif "Vinhedo" in region["regionName"]:
+                json.append(region)
+
+        totalOn = 0
+        totalOff = 0
+
+        for region in json:
+            for service in region["serviceHealthReports"]:
+                if service["serviceStatus"] == "NormalPerformance":
+                    totalOn += 1
+                else:
+                    totalOff += 1
+
+        return {"Normal Performance services": totalOn, "Not Normal Performance services": totalOff}

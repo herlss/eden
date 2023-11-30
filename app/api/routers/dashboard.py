@@ -13,4 +13,4 @@ async def getJiraDash():
 
 @router.get('/oci')
 async def getOciDash():
-    return "OCI Dash"
+    return DashboardService.getOciDashboard()
