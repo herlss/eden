@@ -2,5 +2,4 @@ fastapi
 uvicorn
 bs4
 requests
-selenium
-webdriver_manager
+collections

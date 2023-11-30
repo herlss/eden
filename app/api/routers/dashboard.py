@@ -1,11 +1,11 @@
-from app.api.services.scraping import ScrapingService
+from app.api.services.dashboard import DashboardService
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/dashboard")
 
 @router.get('/aws')
 async def getAwsDash():
-    return "Aws Dash"
+    return DashboardService.getAwsDashboard()
 
 @router.get('/jira')
 async def getJiraDash():
