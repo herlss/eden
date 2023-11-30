@@ -1,23 +1,28 @@
 from app.scraping.aws import AwsDashboardData
-from collections import Counter
 
 class DashboardService:
     @classmethod
-    def getAwsDashboard(self):
+    def getAwsDashboard(cls):
         dashboard = {}
 
         data = AwsDashboardData()
 
         filter = [incident for incident in data if incident["region_name"] in ["N. Virginia", "Sao Paulo"]]
 
-        service_name_counts = Counter(incident["service_name"] for incident in filter)
+        service_count = {}
+        for incident in filter:
+            service_name = incident["service_name"]
+            service_count[service_name] = service_count.get(service_name, 0) + 1
+
+        sao_paulo_count = sum(1 for incident in filter if incident["region_name"] == "Sao Paulo")
+        virginia_count = sum(1 for incident in filter if incident["region_name"] == "N. Virginia")
 
         regions = [
-            ["Sao Paulo", sum(1 for incident in filter if incident["region_name"] == "Sao Paulo")],
-            ["N. Virginia", sum(1 for incident in filter if incident["region_name"] == "N. Virginia")]
+            ["Sao Paulo", sao_paulo_count],
+            ["N. Virginia", virginia_count]
         ]
 
-        dashboard["Incidents by Service"] = [[service_name, count] for service_name, count in service_name_counts.items()]
+        dashboard["Incidents by Service"] = [[service_name, count] for service_name, count in service_count.items()]
         dashboard["Incidents by Region"] = regions
         dashboard["Total Incidents"] = len(filter)
 

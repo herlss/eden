@@ -2,4 +2,3 @@ fastapi
 uvicorn
 bs4
 requests
-collections
