@@ -1,5 +1,6 @@
 import uvicorn
 from os import getenv
+from fastapi import FastAPI
 
 if __name__ == '__main__':
     port = int(getenv("PORT", 8080))
