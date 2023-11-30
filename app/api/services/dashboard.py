@@ -37,7 +37,7 @@ class DashboardService:
 
             dashboard["Incidents by Region"] = regions
             dashboard["Total Incidents"] = len(filter)
-            dashboard["Incidents By Year"]
+            dashboard["Incidents By Year"] = years
 
             return dashboard
         else:
