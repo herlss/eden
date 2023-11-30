@@ -44,15 +44,17 @@ class DashboardService:
         return dashboard
     
     def getJiraServerHealth():
-        serverHealth = {}
+        serverHealth = {
+            'Operational': 0,
+            'Outage': 0
+        }
         data = JiraStatus()
         if data:
             for server in data:
-                if server[1] in serverHealth:
-                    serverHealth[server[1]][0].append(server[0])
-                    serverHealth[server[1]][1] += 1
+                if server[1] == 'Operational':
+                    serverHealth['Operational'] += 1
                 else:
-                    serverHealth[server[1]] = [[server[0]], 1]
+                    serverHealth['Outage'] += 1
             return serverHealth
         else:
             return None
