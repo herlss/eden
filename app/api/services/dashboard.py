@@ -47,28 +47,14 @@ class DashboardService:
             elif "Vinhedo" in region["regionName"]:
                 json.append(region)
 
-        vinhedoOn = 0
-        saoPauloOn = 0
         totalOn = 0
-        vinhedoOff = 0
-        saoPauloOff = 0
         totalOff = 0
 
         for region in json:
-            if "Vinhedo" in region["regionName"]:
-                for service in region["serviceHealthReports"]:
-                    if service["serviceStatus"] == "NormalPerformance":
-                        vinhedoOn += 1
-                    else:
-                        vinhedoOff += 1
-            elif "Sao Paulo" in region["regionName"]:
-                for service in region["serviceHealthReports"]:
-                    if service["serviceStatus"] == "NormalPerformance":
-                        saoPauloOn += 1     
-                    else:
-                        saoPauloOff += 1   
-            totalOn = vinhedoOn + saoPauloOn
-            totalOff = vinhedoOff + saoPauloOff
+            for service in region["serviceHealthReports"]:
+                if service["serviceStatus"] == "NormalPerformance":
+                    totalOn += 1
+                else:
+                    totalOff += 1
 
-        print(saoPauloOn, vinhedoOn, totalOn, saoPauloOff, vinhedoOff, totalOff)
         return {"Normal Performance services": totalOn, "Not Normal Performance services": totalOff}
