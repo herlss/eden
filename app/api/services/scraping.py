@@ -10,3 +10,7 @@ class ScrapingService:
             return jiraStatus
         else:
             return atlassianStatus
+        
+    @classmethod
+    def getAwsStatus(self):
+        return "Hey"
