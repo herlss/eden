@@ -14,5 +14,7 @@ class ScrapingService:
 
         if jiraStatus:
             return jiraStatus
-        else:
+        elif atlassianStatus:
             return atlassianStatus.get('status').get('description')
+        else:
+            return {"Notification": "Error fetching Atlassian"}

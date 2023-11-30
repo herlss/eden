@@ -8,6 +8,8 @@ class StatusService:
 
         if jiraStatus:
             return jiraStatus
-        else:
+        elif atlassianStatus:
             return atlassianStatus
+        else:
+            return {"Notification": "Error fetching Atlassian"}
         

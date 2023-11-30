@@ -1,5 +1,6 @@
 from app.scraping.atlassian import AtlassianIncidents, JiraStatus
 from app.scraping.aws import AwsDashboardData
+from datetime import datetime
 import requests as req
 import json as js
 
@@ -8,42 +9,56 @@ from app.scraping.oci import OciStatus
 class DashboardService:
     @classmethod
     def getAwsDashboard(self):
-        dashboard = {}
-
         data = AwsDashboardData()
 
-        filter = [incident for incident in data if incident["region_name"] in ["N. Virginia", "Sao Paulo"]]
+        if data:
+            dashboard = {}
 
-        serviceCount = {}
-        for incident in filter:
-            serviceName = incident["service_name"]
-            serviceCount[serviceName] = serviceCount.get(serviceName, 0) + 1
+            filter = [incident for incident in data if incident["region_name"] in ["N. Virginia", "Sao Paulo"]]
 
-        saoPauloCount = sum(1 for incident in filter if incident["region_name"] == "Sao Paulo")
-        virginiaCount = sum(1 for incident in filter if incident["region_name"] == "N. Virginia")
+            years = {}
+            for incident in filter:
+                timestamp = incident["launch_date"]
+                dt_object = datetime.fromtimestamp(timestamp)
+                year = str(dt_object.year)
+                
+                if year in years.keys():
+                    years[year] += 1
+                else:
+                    years[year] = 1
+            
+            sp_count = sum(1 for incident in filter if incident["region_name"] == "Sao Paulo")
+            virginia_count = sum(1 for incident in filter if incident["region_name"] == "N. Virginia")
 
-        regions = [
-            ["Sao Paulo", saoPauloCount],
-            ["N. Virginia", virginiaCount]
-        ]
+            regions = [
+                ["Sao Paulo", sp_count],
+                ["N. Virginia", virginia_count]
+            ]
 
-        dashboard["Incidents by Service"] = [[serviceName, count] for serviceName, count in serviceCount.items()]
-        dashboard["Incidents by Region"] = regions
-        dashboard["Total Incidents"] = len(filter)
+            dashboard["Incidents by Region"] = regions
+            dashboard["Total Incidents"] = len(filter)
+            dashboard["Incidents By Year"]
 
-        return dashboard
+            return dashboard
+        else:
+            return {"Notification": "Error fetching AWS"}
     
     @classmethod
     def getJiraDashboard(cls):
-        dashboard = {}
 
-        jiraServerHealth = cls.getJiraServerHealth()
-        if jiraServerHealth:
-            dashboard["Jira Server Health"] = jiraServerHealth
+        jiraHistoricIncidents = cls.getJiraHistoricIncidents()
 
-        dashboard["History of the Last Fifty Incidents"] = cls.getJiraHistoricIncidents()
+        if jiraHistoricIncidents:
+            jiraServerHealth = cls.getJiraServerHealth()
 
-        return dashboard
+            dashboard = {}
+            if jiraServerHealth:
+                dashboard["Jira Server Health"] = jiraServerHealth
+
+            dashboard["History of the Last Fifty Incidents"] = jiraHistoricIncidents
+            return dashboard
+        else:
+            return {"Notification": "Error fetching Atlassian"}
     
     def getJiraServerHealth():
         serverHealth = {
@@ -62,28 +77,34 @@ class DashboardService:
             return None
     
     def getJiraHistoricIncidents():
-        serverHistoric = {}
-        totalIncidents = 0
-        totalIncidentsResolved = 0
-        data = AtlassianIncidents()['incidents']
-        filter = [incident for incident in data if "Jira" in incident['name']]
-        for incidents in filter:
-            if incidents['impact'] in serverHistoric:
-                serverHistoric[incidents['impact']][0] += 1
-                totalIncidents += 1
-                totalIncidentsResolved += 1
-                if incidents['status'] == "resolved":
-                    serverHistoric[incidents['impact']][1] += 1
-            else:
-                serverHistoric[incidents['impact']] = [1, 0]
-                totalIncidents += 1
-                totalIncidentsResolved += 1
-                if incidents['status'] == "resolved":
-                    serverHistoric[incidents['impact']][1] = 1
+        
+        data = AtlassianIncidents()
 
-        serverHistoric['Total of Incidents'] = totalIncidents
-        serverHistoric['Total of Incidents Resolved'] = totalIncidentsResolved
-        return serverHistoric
+        if data:
+            data = data['incidents']
+            serverHistoric = {}
+            totalIncidents = 0
+            totalIncidentsResolved = 0
+            filter = [incident for incident in data if "Jira" in incident['name']]
+            for incidents in filter:
+                if incidents['impact'] in serverHistoric:
+                    serverHistoric[incidents['impact']][0] += 1
+                    totalIncidents += 1
+                    totalIncidentsResolved += 1
+                    if incidents['status'] == "resolved":
+                        serverHistoric[incidents['impact']][1] += 1
+                else:
+                    serverHistoric[incidents['impact']] = [1, 0]
+                    totalIncidents += 1
+                    totalIncidentsResolved += 1
+                    if incidents['status'] == "resolved":
+                        serverHistoric[incidents['impact']][1] = 1
+
+            serverHistoric['Total of Incidents'] = totalIncidents
+            serverHistoric['Total of Incidents Resolved'] = totalIncidentsResolved
+            return serverHistoric
+        else:
+            return {"Notification": "Error fetching Atlassian"}
 
     # Gráfico do dash abaixo será apenas 1(ou 2) big numbers. Colocar na descrição do(s) big number(s): "Oracle Services in Normal 
     # Performance status" e "Oracle Services in not Normal Performance status :/"
@@ -91,22 +112,26 @@ class DashboardService:
     def getOciDashboard(cls):
 
         data = OciStatus()
-        json = []
 
-        for region in data["regionHealthReports"]:
-            if "Sao Paulo" in region["regionName"]:
-                json.append(region)
-            elif "Vinhedo" in region["regionName"]:
-                json.append(region)
+        if data:
+            dashboard = []
 
-        totalOn = 0
-        totalOff = 0
+            for region in data["regionHealthReports"]:
+                if "Sao Paulo" in region["regionName"]:
+                    dashboard.append(region)
+                elif "Vinhedo" in region["regionName"]:
+                    dashboard.append(region)
 
-        for region in json:
-            for service in region["serviceHealthReports"]:
-                if service["serviceStatus"] == "NormalPerformance":
-                    totalOn += 1
-                else:
-                    totalOff += 1
+            totalOn = 0
+            totalOff = 0
 
-        return {"Normal Performance services": totalOn, "Not Normal Performance services": totalOff}
+            for region in dashboard:
+                for service in region["serviceHealthReports"]:
+                    if service["serviceStatus"] == "NormalPerformance":
+                        totalOn += 1
+                    else:
+                        totalOff += 1
+
+            return {"Normal Performance services": totalOn, "Not Normal Performance services": totalOff}
+        else:
+            return {"Notification": "Error fetching OCI"}
