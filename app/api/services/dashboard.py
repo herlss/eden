@@ -59,18 +59,26 @@ class DashboardService:
     
     def getJiraHistoricIncidents():
         serverHistoric = {}
+        totalIncidents = 0
+        totalIncidentsResolved = 0
         data = AtlassianIncidents()['incidents']
         filter = [incident for incident in data if "Jira" in incident['name']]
         for incidents in filter:
             if incidents['impact'] in serverHistoric:
                 serverHistoric[incidents['impact']][0] += 1
+                totalIncidents += 1
+                totalIncidentsResolved += 1
                 if incidents['status'] == "resolved":
                     serverHistoric[incidents['impact']][1] += 1
             else:
                 serverHistoric[incidents['impact']] = [1, 0]
+                totalIncidents += 1
+                totalIncidentsResolved += 1
                 if incidents['status'] == "resolved":
                     serverHistoric[incidents['impact']][1] = 1
-        
+
+        serverHistoric['Total of Incidents'] = totalIncidents
+        serverHistoric['Total of Incidents Resolved'] = totalIncidentsResolved
         return serverHistoric
 
     # Gráfico do dash abaixo será apenas 1(ou 2) big numbers. Colocar na descrição do(s) big number(s): "Oracle Services in Normal 
