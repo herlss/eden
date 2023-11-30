@@ -1,4 +1,6 @@
 from app.scraping.aws import AwsDashboardData
+import requests as req
+import json as js
 
 class DashboardService:
     @classmethod
@@ -27,3 +29,50 @@ class DashboardService:
         dashboard["Total Incidents"] = len(filter)
 
         return dashboard
+
+    # Gráfico do dash abaixo será apenas 1(ou 2) big numbers. Colocar na descrição do(s) big number(s): "Services in Normal 
+    # Performance status" e "Services in not Normal Performance status :/"
+    @classmethod
+    def getOciDashboard(cls):
+        url = "https://ocistatus.oraclecloud.com/api/v2/components_v2.json"
+
+        r = req.get(url)
+
+        data = r.json()
+        json = []
+
+        for region in data["regionHealthReports"]:
+            if "Sao Paulo" in region["regionName"]:
+                json.append(region)
+            elif "Vinhedo" in region["regionName"]:
+                json.append(region)
+
+        vinhedoOn = 0
+        saoPauloOn = 0
+        totalOn = 0
+        vinhedoOff = 0
+        saoPauloOff = 0
+        totalOff = 0
+
+        for region in json:
+            if "Vinhedo" in region["regionName"]:
+                for service in region["serviceHealthReports"]:
+                    if service["serviceStatus"] == "NormalPerformance":
+                        vinhedoOn += 1
+                    else:
+                        vinhedoOff += 1
+            elif "Sao Paulo" in region["regionName"]:
+                for service in region["serviceHealthReports"]:
+                    if service["serviceStatus"] == "NormalPerformance":
+                        saoPauloOn += 1     
+                    else:
+                        saoPauloOff += 1   
+            totalOn = vinhedoOn + saoPauloOn
+            totalOff = vinhedoOff + saoPauloOff
+            # for service in region["serviceHealthReports"]:
+            #     if service["incidents"] != []:
+            #         print(js.dumps(service, indent=4))
+            # print(js.dumps(region, indent=4))
+
+        print(saoPauloOn, vinhedoOn, totalOn, saoPauloOff, vinhedoOff, totalOff)
+        return {"Normal Performance services": totalOn, "Not Normal Performance services": totalOff}
