@@ -69,10 +69,6 @@ class DashboardService:
                         saoPauloOff += 1   
             totalOn = vinhedoOn + saoPauloOn
             totalOff = vinhedoOff + saoPauloOff
-            # for service in region["serviceHealthReports"]:
-            #     if service["incidents"] != []:
-            #         print(js.dumps(service, indent=4))
-            # print(js.dumps(region, indent=4))
 
         print(saoPauloOn, vinhedoOn, totalOn, saoPauloOff, vinhedoOff, totalOff)
         return {"Normal Performance services": totalOn, "Not Normal Performance services": totalOff}
