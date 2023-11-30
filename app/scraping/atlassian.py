@@ -11,6 +11,17 @@ def AtlassianStatus():
         except requests.exceptions.RequestException as e:
             print(f"Error fetching Atlassian status: {e}")
             return None
+        
+def AtlassianIncidents():
+        url = "https://status.atlassian.com/api/v2/incidents.json"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+            return data
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching Atlassian status: {e}")
+            return None
 
 def JiraStatus():
     url = "https://jira-software.status.atlassian.com"

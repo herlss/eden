@@ -9,7 +9,7 @@ async def getAwsDash():
 
 @router.get('/jira')
 async def getJiraDash():
-    return "Jira Dash"
+    return DashboardService.getJiraDashboard()
 
 @router.get('/oci')
 async def getOciDash():
