@@ -15,7 +15,7 @@ class ScrapingService:
         if jiraStatus:
             return jiraStatus
         else:
-            return atlassianStatus
+            return atlassianStatus.get('status').get('description')
         
     @classmethod
     def getAwsStatus(self):
