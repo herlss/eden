@@ -2,6 +2,8 @@
 
 ## Overview
 
+This application was made for the first Instituto J&F Hackathon!
+
 Eden is a real-time status monitoring system that aggregates updates from AWS, Atlassian, and Oracle. This repository houses the scraping and API service, providing a unified interface for users. The front-end application fetches and displays status information, ensuring up-to-date visibility into critical service health.
 
 ## Features
